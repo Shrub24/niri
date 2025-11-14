@@ -128,6 +128,18 @@ impl State {
         if is_mapped(surface) {
             let was_unmapped = self.niri.unmapped_layer_surfaces.remove(surface);
 
+            // Only mark blur dirty for content updates on already-mapped Background/Bottom layers
+            // (initial map is handled by new_layer_surface)
+            if !was_unmapped && matches!(layer.layer(), Layer::Background | Layer::Bottom) {
+                debug!(
+                    "Layer commit on {:?} layer, namespace: {:?} - marking blur dirty",
+                    layer.layer(),
+                    layer.namespace()
+                );
+                // the optimized blur buffer has been dirtied, re-render
+                EffectsFramebuffers::set_dirty(&output);
+            }
+            
             // Resolve rules for newly mapped layer surfaces.
             if was_unmapped {
                 let config = self.niri.config.borrow();
