@@ -3,7 +3,7 @@ use smithay::desktop::{layer_map_for_output, LayerSurface, PopupKind, WindowSurf
 use smithay::output::Output;
 use smithay::reexports::wayland_server::protocol::wl_output::WlOutput;
 use smithay::reexports::wayland_server::protocol::wl_surface::WlSurface;
-use smithay::wayland::compositor::{get_parent, with_states};
+use smithay::wayland::compositor::{get_parent, with_states, BufferAssignment, SurfaceAttributes};
 use smithay::wayland::shell::wlr_layer::{
     self, Layer, LayerSurface as WlrLayerSurface, LayerSurfaceData, WlrLayerShellHandler,
     WlrLayerShellState,
