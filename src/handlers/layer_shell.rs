@@ -125,19 +125,31 @@ impl State {
             .layer_for_surface(surface, WindowSurfaceType::TOPLEVEL)
             .unwrap();
 
+
+
         if is_mapped(surface) {
             let was_unmapped = self.niri.unmapped_layer_surfaces.remove(surface);
 
-            // Only mark blur dirty for content updates on already-mapped Background/Bottom layers
-            // (initial map is handled by new_layer_surface)
+            // Only mark blur dirty when Background/Bottom layers attach a new buffer
+            // (not on every commit, which happens on every frame for pointer events etc.)
             if !was_unmapped && matches!(layer.layer(), Layer::Background | Layer::Bottom) {
-                debug!(
-                    "Layer commit on {:?} layer, namespace: {:?} - marking blur dirty",
-                    layer.layer(),
-                    layer.namespace()
-                );
-                // the optimized blur buffer has been dirtied, re-render
-                EffectsFramebuffers::set_dirty(&output);
+                // Check if a new buffer was attached in this commit
+                let buffer_changed = with_states(surface, |states| {
+                    matches!(
+                        states.cached_state.get::<SurfaceAttributes>().current().buffer,
+                        Some(BufferAssignment::NewBuffer { .. })
+                    )
+                });
+                
+                if buffer_changed {
+                    debug!(
+                        "Buffer changed on {:?} layer (namespace: {:?}) - marking blur dirty",
+                        layer.layer(),
+                        layer.namespace()
+                    );
+                    // the optimized blur buffer has been dirtied, re-render
+                    EffectsFramebuffers::set_dirty(&output);
+                }
             }
             
             // Resolve rules for newly mapped layer surfaces.
