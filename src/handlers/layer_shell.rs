@@ -153,7 +153,7 @@ impl State {
                 //     );
                 //     // the optimized blur buffer has been dirtied, re-render
                 //     EffectsFramebuffers::set_dirty(&output);
-                }
+                // }
             }
             
             // Resolve rules for newly mapped layer surfaces.
