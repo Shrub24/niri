@@ -136,21 +136,23 @@ impl State {
                 && layer.namespace() == "dms:wallpaper"
                 && matches!(layer.layer(), Layer::Background | Layer::Bottom)
             {
+                EffectsFramebuffers::set_dirty(&output);
+
                 // Check if a new buffer was attached in this commit
-                let buffer_changed = with_states(surface, |states| {
-                    matches!(
-                        states.cached_state.get::<SurfaceAttributes>().current().buffer,
-                        Some(BufferAssignment::NewBuffer { .. })
-                    )
-                });
+                // let buffer_changed = with_states(surface, |states| {
+                //     matches!(
+                //         states.cached_state.get::<SurfaceAttributes>().current().buffer,
+                //         Some(BufferAssignment::NewBuffer { .. })
+                //     )
+                // });
                 
-                if buffer_changed {
-                    info!(
-                        "Wallpaper buffer changed (namespace: '{}') - marking blur dirty",
-                        layer.namespace()
-                    );
-                    // the optimized blur buffer has been dirtied, re-render
-                    EffectsFramebuffers::set_dirty(&output);
+                // if buffer_changed {
+                //     info!(
+                //         "Wallpaper buffer changed (namespace: '{}') - marking blur dirty",
+                //         layer.namespace()
+                //     );
+                //     // the optimized blur buffer has been dirtied, re-render
+                //     EffectsFramebuffers::set_dirty(&output);
                 }
             }
             
