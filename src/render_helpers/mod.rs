@@ -355,7 +355,7 @@ fn render_elements(
                     .context("error in capture_framebuffer()")?;
             }
             element
-                .draw(&mut frame, src, dst, &[damage], &[])
+                .draw(&mut frame, src, dst, &[damage], &[], Some(&cache))
                 .context("error drawing element")?;
         }
     }
